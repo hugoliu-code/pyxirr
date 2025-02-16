@@ -1,0 +1,36 @@
+1. installed rust
+2. rust needed tools such as windows sdk
+3. After rust was installed, I decided to get the unittests working
+4. Getting the unittests to run involved creating a .venv, resolving a missing DLL with python
+5. After I got the uniitests to run, I started diving deeper into the project structure
+6. Pretty much the entire codebase is in rust
+7. The algorithmic functionality would be in xirr.rs
+8. The unittests were in the testing folder, but specifically mine would be in test_scheduled (non periodic)
+9. I had to create unittest data
+10. I first used excel before battling with getting the formatting correct. Turns out I needed specifically YY-MM-DD format, with the 
+    dashes and everything. However, excel and google sheets automatically used slashes no matter what I tried when exporting. Confusingly,
+    when I open existing csv files, it also converted all the dashes into slashes. So, I had to install a less complex csv viewer in order
+    to figure out what the issue was. I Eventually decided to manually type in my testing data, using the data originally in the issue as 
+    reference.
+11. After getting the testing data all set up, I started working on normalizing the values. (The variable was "amounts")
+12. I knew that as long as I was able to normalize it in the beginning of the function, the rest should work correctly, because I wasn't
+    messing with the core functionality.
+13. I had to learn Rust syntax and rules when creating the normalization. Rust by default doesn't allow mutability, so I had to do something
+    called shadowing, and used mutable structures such as Vec, in order to sucessfully normalize the variable and allow the remaining code
+    to run as it did before
+14. However, my test cases were still failing.
+15. To debug, I recreated the normalization in function and printed the normalized function out. I then printed out exactly what was being 
+    fed into the core functionality in rust. Both were identical. This was incredibly confusing and led me to believe there was some language
+    specfic floating point arithmetic. What confused me also, was that I was getting a result of ~0.11, which was very close to my desired
+    ~0.13. Later, I would find out that I was mistaken and this similarity was just a coincidence.
+16. I spent a long time with debug statements littered throughout my original normalization code.
+17. Eventually, I looked at the test_schedule file, rather than xirr.rs
+18. I realized that there were multiple "assert" functions. I used print statements to find out which one was failing.
+19. It turns out that there was no floating point arithmetic error, and there was an unknown assert that was failing
+20. Because of the nature of xirr, a way to test it was by using xnpv. With the correct output, xnpv using our xirr should be 0.
+21. What was happening was that, since I was adding only adding code in the xirr function, the XIRR input was being normalized, but 
+    not the XNPV input. 
+22. I decided to add a function in utils.rs to normalize slices
+23. After this, everything slid into place.
+24. The coincidence of 0.11 being close to 0.13 was just a coincidence, as 0.11 represented the output of xnpv, not the rate that generated
+    by xirr. I should have payed more attention to what was being tested and outputted instead of assuming.
