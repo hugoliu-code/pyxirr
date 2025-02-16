@@ -2,7 +2,7 @@ use super::{year_fraction, DayCount};
 use crate::core::{
     models::{validate, validate_length, DateLike, InvalidPaymentsError},
     optimize::{brentq, newton_raphson_2},
-    utils::{fast_pow, initial_guess},
+    utils::{fast_pow, initial_guess, normalize_vector},
 };
 
 pub fn xirr(
@@ -12,6 +12,9 @@ pub fn xirr(
     day_count: Option<DayCount>,
 ) -> Result<f64, InvalidPaymentsError> {
     validate(amounts, Some(dates))?;
+
+    let amounts_vec: Vec<f64> = normalize_vector(amounts);
+    let amounts: &[f64] = &amounts_vec;
 
     let deltas = &day_count_factor(dates, day_count);
 
@@ -96,6 +99,10 @@ fn day_count_factor(dates: &[DateLike], day_count: Option<DayCount>) -> Vec<f64>
 
 // \sum_{i=1}^n \frac{P_i}{(1 + rate)^{(d_i - d_0)/365}}
 fn xnpv_result(payments: &[f64], deltas: &[f64], rate: f64) -> f64 {
+    // possibly normalize values
+    let payments_vec: Vec<f64> = normalize_vector(payments);
+    let payments: &[f64] = &payments_vec;
+
     if rate <= -1.0 {
         // bound newton_raphson
         return f64::INFINITY;

@@ -39,7 +39,7 @@ fn test_xnpv_samples(#[case] input: &str, #[case] expected: f64) {
 #[case::case_30_10("tests/samples/30-10.csv", 0.11143674454788119)]
 #[case::case_30_11("tests/samples/30-11.csv", -0.12606921657689435)]
 #[case::case_30_12("tests/samples/30-12.csv", -0.02578630164755525)]
-#[case::case_30_13("tests/samples/30-13.csv", -0.6590570693637554)]  // -0.02910731236366771
+#[case::case_30_13("tests/samples/30-13.csv", -0.6590570693637554)] // -0.02910731236366771
 #[case::case_30_14("tests/samples/30-14.csv", 0.6996860198137344)]
 #[case::case_30_15("tests/samples/30-15.csv", 0.02976853488940409)]
 #[case::case_30_16("tests/samples/30-16.csv", 0.44203743561153225)]
@@ -81,9 +81,13 @@ fn test_xnpv_samples(#[case] input: &str, #[case] expected: f64) {
 #[case::close_to_minus_0_993("tests/samples/minus_0_993.csv", -0.993785049929284)]
 #[case::zeros("tests/samples/zeros.csv", 0.175680730580782)]
 #[case::neg_1938("tests/samples/1938.csv", -0.5945650822679239)]
+#[case::normalize1("tests/samples/xirr_normalize_test1.csv", -0.13761159201780845)]
+#[case::normalize2("tests/samples/xirr_normalize_test2.csv", -0.13653769882244854)]
+#[case::normalize3("tests/samples/xirr_normalize_test3.csv", -0.13653769882244854)]
 fn test_xirr_samples(#[case] input: &str, #[case] expected: f64) {
     let result = Python::with_gil(|py| {
         let payments = PaymentsLoader::from_csv(py, input).to_records();
+
         let rate: Option<f64> = pyxirr_call!(py, "xirr", (payments,));
 
         if let Some(rate) = rate {

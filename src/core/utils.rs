@@ -59,3 +59,15 @@ where
 {
     rate.is_finite() && f(rate).abs() < 1e-3
 }
+
+pub(crate) fn normalize_vector(values: &[f64]) -> Vec<f64> {
+    let max_val = values.iter().max_by(|x, y| x.abs().partial_cmp(&y.abs()).unwrap()).unwrap();
+    let max_val = max_val.abs();
+    let mut amounts_vec: Vec<f64> = values.to_vec();
+
+    if max_val > 10000000000.0 {
+        amounts_vec = amounts_vec.iter().map(|&x| x / max_val).collect();
+    }
+
+    amounts_vec
+}
